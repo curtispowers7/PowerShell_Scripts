@@ -99,3 +99,32 @@ function Get-InstalledApplications($strComputerName){
 		}
 	}
 }
+
+
+
+#Pulls the headers from a web server and checks to see if "Strict-Transport-Security" is added into the headers, forcing a website to use HTTPS over HTTP
+function Check-StrictTransportSecurity ($hostname, $port) {
+
+	$u = "https://$($hostname):$($port)"
+	
+	try {
+		$r = Invoke-WebRequest -uri $u
+	}catch{
+		$r = ""
+	}
+	
+	if($r){
+	
+		$r.headers
+		if($r.headers."Strict-Transport-Security"){
+			echo "Thank you for providing the information needed to validate this finding is no longer an issue. I confirmed from the comment that the value of `"Strict-Transport-Security`" is $($r.headers."Strict-Transport-Security") has been added to the headers for $hostname."
+		}else{
+			echo "For the server in question, the following command was run: (Invoke-WebRequest -Uri `"https://$($hostname):$($port)`").headers. This should have resulted in a variable of Strict-Transport-Security with a value of max-age=31536000, however, this variable was not present. This was the result of the headers for that command: $(foreach($i in $r.headers.keys){echo "$i - $($r.headers.$i)"})"
+		}
+	}else{
+		
+		echo "no request"
+	
+	}
+
+}
