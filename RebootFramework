@@ -1,3 +1,11 @@
+<#
+
+Author: Curtis Powers
+Intent: Provide a framework for creating a package in SCCM or Tanium to persist through multiple reboots
+Changes: 
+
+#>
+
 <#----------------------------------------------------------------------------------
 
 	This script is a framework to use when needing to create a package for a configuration management tool (such as Tanium, SCCM) that requires multiple restarts for the entire process to finish. 
