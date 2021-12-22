@@ -128,3 +128,53 @@ function Check-StrictTransportSecurity ($hostname, $port) {
 	}
 
 }
+
+
+
+#Takes a downloaded HTML file of a Remedy ticket view and exports the tickets to a CSV file
+function Export-RemedyTickets {
+
+	Param(
+		[Parameter(Mandatory=$true)]
+		[String]
+		$Path,
+		[Parameter(Mandatory=$true)]
+		[String]
+		$HtmlFilePath
+	)
+	
+	#import html file
+	$HTML = New-Object -ComObject "HTMLFile"
+	$HTML.IHTMLDocument2_write((get-content -Path $HtmlFilePath -raw))
+	
+
+	#Set all rows to an array
+	$rows = $HTML.all.tags('div') | where{$_.classname -match "ng-scope ngRow (even|odd)"} 
+	
+	$Tickets = @()
+	
+	foreach($row in $rows){
+		
+		#Create a new custom object
+		$tmpObject = [pscustomobject]@{
+		
+			WorkOrder = $row.getelementsbyclassname('ngCellText ng-scope col2 colt2') | %{$_.textcontent}
+			Assignee = $row.getelementsbyclassname('ngCellText ng-scope col6 colt6') | %{$_.textcontent}
+			Summary = $row.getelementsbyclassname('ngCellText ng-scope col7 colt7') | %{$_.textcontent}
+			LastModifiedDate = $row.getelementsbyclassname('ngCellText ng-scope col9 colt9') | %{$_.textcontent}
+		
+		}
+		
+		
+		#Add custom object with all information into empty array above
+		$Tickets += $tmpObject
+		
+	}
+	
+	
+	#Export the array of custom objects to a csv
+	$Tickets | Export-Csv -Path $Path -NoTypeInformation
+	
+
+}
+
