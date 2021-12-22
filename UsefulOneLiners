@@ -28,6 +28,10 @@ $Computers = $Searcher.findall().properties
 (get-filehash -InputStream $([IO.MemoryStream]::new([byte[]][char[]]"StringValue")) -Algorithm SHA1).hash
 
 
+#Get windows event logs matching a specific ID (Using FilterHashTable is the fasted way to retrieve logs, which is necessary for pulling logs from a remote computer)
+Get-WinEvent -FilterHashTable @{LogName="System"; Id="6006"; StartTime=$((get-date).adddays(-14))}
+
+
 #Adding parameters to PowerShell scripts for Tanium
 # In the Tanium Sensor builder, add a Parameter for each Parameter set below. Set the Delimiter in the Sensor Builder as it is set below.
 # When executed on the client, Tanium will auto search/replace specified Parameters within this script before calling it.
